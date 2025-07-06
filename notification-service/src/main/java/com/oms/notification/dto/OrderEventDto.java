@@ -2,6 +2,7 @@ package com.oms.notification.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oms.notification.entity.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class OrderEventDto {
     private BigDecimal totalAmount;
     
     @JsonProperty("status")
-    private String status; // Changed from OrderStatus to String
+    private OrderStatus status; 
     
     @JsonProperty("eventType")
     private String eventType;
@@ -39,7 +40,7 @@ public class OrderEventDto {
     }
     
     public OrderEventDto(Long orderId, Long userId, String productName, Integer quantity, 
-                        BigDecimal totalAmount, String status, String eventType) {
+                        BigDecimal totalAmount, OrderStatus status, String eventType) {
         this.orderId = orderId;
         this.userId = userId;
         this.productName = productName;
@@ -66,8 +67,8 @@ public class OrderEventDto {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     
-    public String getStatus() { return status; } // Changed return type to String
-    public void setStatus(String status) { this.status = status; }
+    public OrderStatus getStatus() { return status; } // Changed return type to String
+    public void setStatus(OrderStatus status) { this.status = status; }
     
     public String getEventType() { return eventType; }
     public void setEventType(String eventType) { this.eventType = eventType; }

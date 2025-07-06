@@ -5,23 +5,17 @@ spring:
   application:
     name: order-service
 
-  # H2 Database configuration for testing
+  # PostgreSQL Database configuration
   datasource:
-    url: jdbc:h2:mem:orderdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-
-  # Enable H2 console for debugging
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/orderdb
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: order123
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
 
   # Kafka Configuration

@@ -25,7 +25,7 @@ public class OrderEventDto {
     private BigDecimal totalAmount;
     
     @JsonProperty("status")
-    private String status; // Changed to String for JSON compatibility
+    private OrderStatus status; 
     
     @JsonProperty("eventType")
     private String eventType;
@@ -46,7 +46,7 @@ public class OrderEventDto {
         this.productName = productName;
         this.quantity = quantity;
         this.totalAmount = totalAmount;
-        this.status = status.toString(); // Convert enum to string
+        this.status = status; 
         this.eventType = eventType;
         this.timestamp = LocalDateTime.now();
     }
@@ -67,8 +67,8 @@ public class OrderEventDto {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
     
     public String getEventType() { return eventType; }
     public void setEventType(String eventType) { this.eventType = eventType; }

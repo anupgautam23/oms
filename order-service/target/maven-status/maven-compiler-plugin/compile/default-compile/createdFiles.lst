@@ -1,6 +1,7 @@
 com/oms/order/service/KafkaProducerService.class
 com/oms/order/exception/OrderNotFoundException.class
 com/oms/order/entity/Order.class
+com/oms/order/controller/TestController.class
 com/oms/order/config/SecurityConfig.class
 com/oms/order/controller/OrderController.class
 com/oms/order/repository/OrderRepository.class
@@ -10,6 +11,7 @@ com/oms/order/config/JwtAuthenticationFilter.class
 com/oms/order/dto/CreateOrderRequestDto.class
 com/oms/order/util/JwtUtil.class
 com/oms/order/entity/OrderStatus.class
+com/oms/order/config/JacksonConfig.class
 com/oms/order/exception/UnauthorizedException.class
 com/oms/order/exception/GlobalExceptionHandler.class
 com/oms/order/dto/OrderEventDto.class

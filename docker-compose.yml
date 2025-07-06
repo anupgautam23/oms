@@ -10,11 +10,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: order123
     ports:
-      - "5434:5432" # Changed from 5432 to 5434
+      - "5434:5432"
     volumes:
       - order_db_data:/var/lib/postgresql/data
     networks:
       - oms-network
+    profiles:
+      - order
+      - all
 
   # PostgreSQL for Auth Service
   auth-db:
@@ -25,11 +28,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: auth123
     ports:
-      - "5433:5432" # Keep this as is
+      - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
     networks:
       - oms-network
+    profiles:
+      - auth
+      - all
 
   # PostgreSQL for Notification Service
   notification-db:
@@ -40,11 +46,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: notification123
     ports:
-      - "5435:5432" # Another unique port
+      - "5435:5432"
     volumes:
       - notification_db_data:/var/lib/postgresql/data
     networks:
       - oms-network
+    profiles:
+      - notification
+      - all
 
   # Kafka (for later)
   kafka:
@@ -60,6 +69,9 @@ services:
       - zookeeper
     networks:
       - oms-network
+    profiles:
+      - kafka
+      - all
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -70,6 +82,9 @@ services:
       - "2181:2181"
     networks:
       - oms-network
+    profiles:
+      - kafka
+      - all
 
 volumes:
   order_db_data:

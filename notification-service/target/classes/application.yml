@@ -42,7 +42,7 @@ jwt:
 kafka:
   enabled: true
   topics:
-    order-events: order-events-v2
+    order-events: order-events
 
 # Email settings
 email:

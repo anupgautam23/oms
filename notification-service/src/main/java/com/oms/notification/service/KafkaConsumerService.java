@@ -28,7 +28,7 @@ public class KafkaConsumerService {
         this.objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
     
-    @KafkaListener(topics = "order-events-v2", groupId = "notification-service-group-v5")
+    @KafkaListener(topics = "order-events", groupId = "notification-service-group-v5")
     public void consumeOrderEvent(
             @Payload String rawMessage,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,

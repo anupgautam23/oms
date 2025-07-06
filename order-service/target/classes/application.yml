@@ -7,7 +7,7 @@ spring:
 
   # PostgreSQL Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/orderdb
+    url: jdbc:postgresql://localhost:5434/orderdb
     driverClassName: org.postgresql.Driver
     username: postgres
     password: order123

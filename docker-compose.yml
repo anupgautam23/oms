@@ -1,0 +1,81 @@
+version: "3.8"
+
+services:
+  # PostgreSQL for Order Service
+  order-db:
+    image: postgres:15
+    container_name: order-db
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: order123
+    ports:
+      - "5434:5432" # Changed from 5432 to 5434
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - oms-network
+
+  # PostgreSQL for Auth Service
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: auth123
+    ports:
+      - "5433:5432" # Keep this as is
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - oms-network
+
+  # PostgreSQL for Notification Service
+  notification-db:
+    image: postgres:15
+    container_name: notification-db
+    environment:
+      POSTGRES_DB: notificationdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: notification123
+    ports:
+      - "5435:5432" # Another unique port
+    volumes:
+      - notification_db_data:/var/lib/postgresql/data
+    networks:
+      - oms-network
+
+  # Kafka (for later)
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - oms-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - oms-network
+
+volumes:
+  order_db_data:
+  auth_db_data:
+  notification_db_data:
+
+networks:
+  oms-network:
+    driver: bridge

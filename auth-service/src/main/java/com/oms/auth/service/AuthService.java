@@ -9,7 +9,6 @@ import com.oms.auth.exception.UserAlreadyExistsException;
 import com.oms.auth.exception.UserNotFoundException;
 import com.oms.auth.repository.UserRepository;
 import com.oms.auth.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

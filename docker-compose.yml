@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: orderdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: order123
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order123}
     ports:
       - "5434:5432"
     volumes:
@@ -26,7 +26,7 @@ services:
     environment:
       POSTGRES_DB: authdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: auth123
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth123}
     ports:
       - "5433:5432"
     volumes:
@@ -44,7 +44,7 @@ services:
     environment:
       POSTGRES_DB: notificationdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: notification123
+      POSTGRES_PASSWORD: ${NOTIFICATION_DB_PASSWORD:-notification123}
     ports:
       - "5435:5432"
     volumes:

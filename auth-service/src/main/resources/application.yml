@@ -5,12 +5,12 @@ spring:
   application:
     name: auth-service
 
-  # H2 Database configuration for testing
+  # PostgreSQL Database configuration
   datasource:
     url: jdbc:postgresql://localhost:5433/authdb
     driverClassName: org.postgresql.Driver
     username: postgres
-    password: auth123
+    password: ${AUTH_DB_PASSWORD:auth123}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -19,5 +19,5 @@ spring:
     show-sql: true
 
 jwt:
-  secret: bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=
+  secret: ${JWT_SECRET:bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=}
   expiration: 86400000 # 24 hours in milliseconds

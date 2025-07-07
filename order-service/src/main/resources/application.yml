@@ -10,7 +10,7 @@ spring:
     url: jdbc:postgresql://localhost:5434/orderdb
     driverClassName: org.postgresql.Driver
     username: postgres
-    password: order123
+    password: ${ORDER_DB_PASSWORD:order123}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -20,7 +20,7 @@ spring:
 
   # Kafka Configuration
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -34,7 +34,7 @@ spring:
       adjust-dates-to-context-time-zone: false
 
 jwt:
-  secret: bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=
+  secret: ${JWT_SECRET:bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=}
   expiration: 86400000 # 24 hours in milliseconds
 
 auth:
@@ -45,4 +45,4 @@ auth:
 kafka:
   enabled: true
   topics:
-    order-events: order-events-v2
+    order-events: order-events

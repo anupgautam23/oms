@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
     
     private static final Logger logger = LoggerFactory.getLogger(KafkaProducerService.class);
-    private static final String ORDER_EVENTS_TOPIC = "order-events-v2";
+    private static final String ORDER_EVENTS_TOPIC = "order-events";
     
     private final KafkaTemplate<String, OrderEventDto> kafkaTemplate;
     

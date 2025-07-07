@@ -1,80 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 
+    ==============================================
+    SPRING BOOT PARENT CONFIGURATION
+    ==============================================
+    This inherits all Spring Boot configurations and dependency management
+    -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
-        <relativePath/>
+        <version>3.2.0</version>
+        <relativePath />
     </parent>
 
+    <!-- 
+    ==============================================
+    PROJECT INFORMATION
+    ==============================================
+    Basic project metadata and identification
+    -->
     <groupId>com.oms</groupId>
     <artifactId>auth-service</artifactId>
     <version>1.0.0</version>
     <name>auth-service</name>
     <description>Authentication Service for Order Management System</description>
 
+    <!-- 
+    ==============================================
+    PROJECT PROPERTIES
+    ==============================================
+    Define versions and configuration properties
+    -->
     <properties>
-        <java.version>17</java.version>
-        <jjwt.version>0.11.5</jjwt.version>
+        <!-- Java version compatibility -->
+        <java.version>21</java.version>
+
+        <!-- JWT library version for authentication -->
+        <jjwt.version>0.12.3</jjwt.version>
+
+        <!-- PostgreSQL driver version -->
         <postgresql.version>42.7.2</postgresql.version>
+
+        <!-- Maven compiler settings -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+
+        <!-- Encoding settings -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+    <!-- 
+    ==============================================
+    DEPENDENCIES
+    ==============================================
+    All project dependencies organized by category
+    -->
     <dependencies>
-        <!-- Spring Boot Starters -->
+
+        <!-- 
+        ==========================================
+        SPRING BOOT STARTERS
+        ==========================================
+        Core Spring Boot functionality
+        -->
+
+        <!-- Web framework for REST APIs -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        
+
+        <!-- Security framework for authentication and authorization -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        
+
+        <!-- JPA and Hibernate for database operations -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        
+
+        <!-- Bean validation for request validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Database -->
+        <!-- 
+        ==========================================
+        DATABASE DEPENDENCIES
+        ==========================================
+        Database drivers and connections
+        -->
+
+        <!-- PostgreSQL database driver for production -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
-        
-        <!-- H2 Database for testing -->
+
+        <!-- H2 in-memory database for testing -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- JWT Dependencies -->
+        <!-- 
+        ==========================================
+        JWT AUTHENTICATION DEPENDENCIES
+        ==========================================
+        JSON Web Token implementation for secure authentication
+        -->
+
+        <!-- JWT API interface -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-        
+
+        <!-- JWT implementation (runtime only) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
-        
+
+        <!-- JWT Jackson JSON processor (runtime only) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
@@ -82,51 +145,228 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Test Dependencies -->
+        <!-- 
+        ==========================================
+        TEST DEPENDENCIES
+        ==========================================
+        Testing frameworks and utilities (test scope only)
+        -->
+
+        <!-- Spring Boot test framework with JUnit, Mockito, etc. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- Spring Security test utilities -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- 
+        ==========================================
+        JSON PROCESSING DEPENDENCIES
+        ==========================================
+        For handling JSON serialization/deserialization
+        -->
+
+        <!-- Jackson core for JSON processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Jackson support for Java 8+ time types -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
     </dependencies>
 
+    <!-- 
+    ==============================================
+    BUILD CONFIGURATION
+    ==============================================
+    Maven plugins and build settings
+    -->
     <build>
         <plugins>
+
+            <!-- 
+            ==========================================
+            SPRING BOOT MAVEN PLUGIN
+            ==========================================
+            Enables Spring Boot specific Maven goals
+            -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Enable build info for actuator -->
+                    <buildInfo>true</buildInfo>
+
+                    <!-- Configuration for running with profiles -->
+                    <profiles>
+                        <profile>local</profile>
+                        <profile>dev</profile>
+                    </profiles>
+
+                    <!-- JVM arguments for development -->
+                    <jvmArguments>
+                        -Dspring.profiles.active=local
+                        -Dspring.devtools.restart.enabled=true
+                    </jvmArguments>
+                </configuration>
             </plugin>
-          <!-- Auto-start Docker containers -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-                <execution>
-                    <id>start-auth-dependencies</id>
-                    <phase>validate</phase>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                    <configuration>
-                        <executable>docker-compose</executable>
-                        <workingDirectory>${project.parent.basedir}</workingDirectory>
-                        <arguments>
-                            <argument>--profile</argument>
-                            <argument>auth</argument>
-                            <argument>up</argument>
-                            <argument>-d</argument>
-                        </arguments>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+
+            <!-- 
+            ==========================================
+            DOCKER COMPOSE AUTOMATION PLUGIN
+            ==========================================
+            Automatically starts required Docker containers
+            when Maven validates the project
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>start-auth-dependencies</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Command to execute -->
+                            <executable>docker-compose</executable>
+
+                            <!-- Working directory (parent project root) -->
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
+
+                            <!-- Arguments for docker-compose command -->
+                            <arguments>
+                                <argument>--profile</argument>
+                                <argument>auth</argument>         <!-- Only auth service dependencies -->
+                                <argument>up</argument>
+                                <argument>-d</argument>           <!-- Detached mode -->
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 
+            ==========================================
+            MAVEN COMPILER PLUGIN
+            ==========================================
+            Explicit Java 21 configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <encoding>UTF-8</encoding>
+
+                    <!-- Enable preview features if needed -->
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- 
+            ==========================================
+            MAVEN SUREFIRE PLUGIN
+            ==========================================
+            Configuration for running tests
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <!-- JVM arguments for tests -->
+                    <argLine>
+                        --enable-preview
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                    </argLine>
+
+                    <!-- Test profiles -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>test</spring.profiles.active>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
+
+    <!-- 
+    ==============================================
+    PROFILES
+    ==============================================
+    Different build profiles for various environments
+    -->
+    <profiles>
+
+        <!-- Local development profile -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <spring.profiles.active>local</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <!-- Development environment profile -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <!-- Production environment profile -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <!-- Integration test profile -->
+        <profile>
+            <id>integration-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+
 </project>

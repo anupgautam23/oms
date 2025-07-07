@@ -10,7 +10,7 @@ spring:
     url: jdbc:postgresql://localhost:5435/notificationdb
     driverClassName: org.postgresql.Driver
     username: postgres
-    password: notification123
+    password: ${NOTIFICATION_DB_PASSWORD:notification123}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -20,7 +20,7 @@ spring:
 
   # Kafka Configuration - Simplified
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: notification-service-group-v5
       auto-offset-reset: latest
@@ -35,7 +35,7 @@ spring:
       adjust-dates-to-context-time-zone: false
 
 jwt:
-  secret: bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=
+  secret: ${JWT_SECRET:bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=}
   expiration: 86400000 # 24 hours in milliseconds
 
 # Enable Kafka

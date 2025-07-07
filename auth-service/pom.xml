@@ -95,6 +95,21 @@
 
         <!-- 
         ==========================================
+        DEVELOPMENT TOOLS
+        ==========================================
+        Auto-restart and live reload for development
+        -->
+
+        <!-- Spring Boot DevTools for automatic restart -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 
+        ==========================================
         DATABASE DEPENDENCIES
         ==========================================
         Database drivers and connections
@@ -147,6 +162,25 @@
 
         <!-- 
         ==========================================
+        JSON PROCESSING DEPENDENCIES
+        ==========================================
+        For handling JSON serialization/deserialization
+        -->
+
+        <!-- Jackson core for JSON processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Jackson support for Java 8+ time types -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- 
+        ==========================================
         TEST DEPENDENCIES
         ==========================================
         Testing frameworks and utilities (test scope only)
@@ -164,25 +198,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <!-- 
-        ==========================================
-        JSON PROCESSING DEPENDENCIES
-        ==========================================
-        For handling JSON serialization/deserialization
-        -->
-
-        <!-- Jackson core for JSON processing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-
-        <!-- Jackson support for Java 8+ time types -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
     </dependencies>
@@ -209,6 +224,10 @@
                     <!-- Enable build info for actuator -->
                     <buildInfo>true</buildInfo>
 
+                    <!-- Enable DevTools for auto-restart -->
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+
                     <!-- Configuration for running with profiles -->
                     <profiles>
                         <profile>local</profile>
@@ -219,6 +238,7 @@
                     <jvmArguments>
                         -Dspring.profiles.active=local
                         -Dspring.devtools.restart.enabled=true
+                        -Dspring.devtools.livereload.enabled=true
                     </jvmArguments>
                 </configuration>
             </plugin>

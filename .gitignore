@@ -1,17 +1,245 @@
-# Environment variables
+# ===============================================
+# ENVIRONMENT VARIABLES
+# ===============================================
 .env
 .env.local
 .env.production
+.env.development
+.env.test
+.env.*.local
 
-# Logs
+# ===============================================
+# LOGS
+# ===============================================
 *.log
 logs/
+spring.log
+application.log
 
-# IDE
+# ===============================================
+# IDE FILES
+# ===============================================
+# VS Code
 .vscode/
-.idea/
-*.iml
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# OS
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.metadata
+.factorypath
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ===============================================
+# OPERATING SYSTEM FILES
+# ===============================================
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux
+*~
+.directory
+
+# ===============================================
+# JAVA & MAVEN
+# ===============================================
+# Compiled class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Maven Wrapper
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===============================================
+# SPRING BOOT
+# ===============================================
+**/target/
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Spring Boot specific
+application-local.yml
+application-local.properties
+application-dev.yml
+application-dev.properties
+
+# ===============================================
+# DATABASES
+# ===============================================
+# H2 Database
+*.db
+*.trace.db
+*.lock.db
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Database dumps
+*.sql.gz
+*.dump
+
+# ===============================================
+# DOCKER
+# ===============================================
+.dockerignore
+
+# ===============================================
+# GRADLE (if used)
+# ===============================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ===============================================
+# TEMPORARY FILES
+# ===============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# ===============================================
+# SECURITY & SECRETS
+# ===============================================
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+secrets.yml
+secrets.yaml
+private.yml
+private.yaml
+
+# ===============================================
+# NODE.JS (if frontend included)
+# ===============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ===============================================
+# TESTING
+# ===============================================
+# Coverage reports
+coverage/
+*.cover
+*.py,cover
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# JUnit
+TEST-*.xml
+
+# ===============================================
+# DOCUMENTATION
+# ===============================================
+# Generated documentation
+/docs/build/
+/docs/_build/
+site/
+
+# ===============================================
+# MISC
+# ===============================================
+# Backup files
+*.bak
+*.gho
+*.ori
+*.orig
+*.tmp
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Custom application files
+uploads/
+temp/
+cache/
+.cache/

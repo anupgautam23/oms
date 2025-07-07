@@ -57,7 +57,7 @@ The OMS consists of three microservices that communicate via REST APIs and Kafka
 
 ## 🔧 Prerequisites
 
-- **Java 17** or higher
+- **Java 21** (OpenJDK 21.0.6 or higher) ✅
 - **Maven 3.8+**
 - **Docker** and **Docker Compose**
 - **Git**
@@ -72,7 +72,14 @@ git clone https://github.com/anupgautam23/oms.git
 cd oms
 ```
 
-### 2. Set Up Environment Variables
+### 2. Verify Java Version
+
+```bash
+java -version
+# Should show: openjdk version "21.0.6" 2025-01-21 LTS
+```
+
+### 3. Set Up Environment Variables
 
 ```bash
 # Copy the environment template
@@ -82,40 +89,52 @@ cp .env.example .env
 # The default values work fine for local development
 ```
 
-### 3. Make Scripts Executable
+### 4. Make Scripts Executable
 
 ```bash
 chmod +x *.sh
 ```
 
-### 4. Start All Infrastructure
+### 5. Start All Infrastructure
 
 ```bash
 # Start all databases and Kafka
 ./start-all.sh
 ```
 
-### 5. Start Individual Services
+### 6. Start Individual Services
 
-**Terminal 1 - Auth Service:**
+**Option 1: Using Service Scripts (Recommended)**
 ```bash
+# Terminal 1 - Auth Service
+./start-auth.sh
+
+# Terminal 2 - Order Service
+./start-order.sh
+
+# Terminal 3 - Notification Service
+./start-notification.sh
+```
+
+**Option 2: Manual Start**
+```bash
+# Terminal 1 - Auth Service
+export $(cat .env | grep -v '^#' | xargs)
 cd auth-service
-./mvnw spring-boot:run
-```
+mvn spring-boot:run
 
-**Terminal 2 - Order Service:**
-```bash
+# Terminal 2 - Order Service
+export $(cat .env | grep -v '^#' | xargs)
 cd order-service
-./mvnw spring-boot:run
-```
+mvn spring-boot:run
 
-**Terminal 3 - Notification Service:**
-```bash
+# Terminal 3 - Notification Service
+export $(cat .env | grep -v '^#' | xargs)
 cd notification-service
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
-### 6. Verify Everything is Running
+### 7. Verify Everything is Running
 
 ```bash
 # Check all containers
@@ -141,11 +160,11 @@ cp .env.example .env
 
 | Variable | Description | Default Value |
 |----------|-------------|---------------|
-| `AUTH_DB_PASSWORD` | Auth database password | `*****` |
+| `AUTH_DB_PASSWORD` | Auth database password | `****` |
 | `ORDER_DB_PASSWORD` | Order database password | `****` |
 | `NOTIFICATION_DB_PASSWORD` | Notification database password | `****` |
 | `KAFKA_BOOTSTRAP_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
-| `JWT_SECRET` | JWT signing secret | (set in production) |
+| `JWT_SECRET` | JWT signing secret | (base64 encoded) |
 
 ### 📁 Project Structure
 
@@ -158,6 +177,9 @@ oms/
 ├── .env.example           # Environment template
 ├── .env                   # Your environment variables (gitignored)
 ├── start-all.sh           # Start all containers
+├── start-auth.sh          # Start auth service with dependencies
+├── start-order.sh         # Start order service with dependencies
+├── start-notification.sh  # Start notification service with dependencies
 ├── start-kafka.sh         # Start Kafka only
 ├── kafka-*.sh             # Kafka management scripts
 └── README.md
@@ -166,16 +188,22 @@ oms/
 ## 🏢 Services
 
 ### Auth Service (Port 8081)
+- **Framework:** Spring Boot 3.2.0
+- **Java Version:** 21
 - **Database:** PostgreSQL (Port 5433)
 - **Features:** User registration, authentication, JWT tokens
 - **Auto-starts:** `auth-db` container
 
 ### Order Service (Port 8082)
+- **Framework:** Spring Boot 3.2.0
+- **Java Version:** 21
 - **Database:** PostgreSQL (Port 5434)
 - **Features:** Order management, inventory tracking, event publishing
 - **Auto-starts:** `order-db` + `kafka` + `zookeeper` containers
 
 ### Notification Service (Port 8083)
+- **Framework:** Spring Boot 3.2.0
+- **Java Version:** 21
 - **Database:** PostgreSQL (Port 5435)
 - **Features:** Event processing, email notifications, notification history
 - **Auto-starts:** `notification-db` + `kafka` + `zookeeper` containers
@@ -195,7 +223,7 @@ oms/
 ### Connect with Database Client (TablePlus)
 
 1. **Auth Database:**
-   ```bash
+   ```
    Host: localhost
    Port: 5433
    Database: authdb
@@ -204,7 +232,7 @@ oms/
    ```
 
 2. **Order Database:**
-   ```bash
+   ```
    Host: localhost
    Port: 5434
    Database: orderdb
@@ -213,7 +241,7 @@ oms/
    ```
 
 3. **Notification Database:**
-   ```bash
+   ```
    Host: localhost
    Port: 5435
    Database: notificationdb
@@ -353,6 +381,9 @@ GET http://localhost:8083/api/notifications/email/{email}
 | Script | Description |
 |--------|-------------|
 | `./start-all.sh` | Start all databases and Kafka |
+| `./start-auth.sh` | Start auth service with dependencies |
+| `./start-order.sh` | Start order service with dependencies |
+| `./start-notification.sh` | Start notification service with dependencies |
 | `./start-kafka.sh` | Start only Kafka and Zookeeper |
 | `./kafka-topics.sh` | Create and manage Kafka topics |
 | `./kafka-monitor.sh` | Monitor Kafka messages in real-time |
@@ -365,16 +396,39 @@ GET http://localhost:8083/api/notifications/email/{email}
    ./start-all.sh
    ```
 
-2. **Run Service in Development Mode:**
+2. **Start Services (Option 1 - Using Scripts):**
    ```bash
-   cd {service-name}
-   ./mvnw spring-boot:run
+   # Terminal 1
+   ./start-auth.sh
+   
+   # Terminal 2
+   ./start-order.sh
+   
+   # Terminal 3
+   ./start-notification.sh
    ```
 
-3. **Auto-restart on Changes:**
+3. **Start Services (Option 2 - Manual):**
    ```bash
-   ./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=dev"
+   # Export environment variables first
+   export $(cat .env | grep -v '^#' | xargs)
+   
+   # Then start services
+   cd auth-service && mvn spring-boot:run
    ```
+
+### Tech Stack
+
+- **Java:** 21 (OpenJDK Temurin)
+- **Spring Boot:** 3.2.0
+- **Spring Security:** 6.x
+- **Spring Data JPA:** 3.x
+- **Spring Kafka:** 3.x
+- **PostgreSQL:** 15
+- **Apache Kafka:** 7.4.0
+- **JWT:** 0.11.5
+- **Docker:** Latest
+- **Maven:** 3.8+
 
 ### Docker Compose Profiles
 
@@ -404,10 +458,10 @@ docker-compose --profile all up -d
 ```bash
 # Run tests for a specific service
 cd auth-service
-./mvnw test
+mvn test
 
 # Run tests with coverage
-./mvnw test jacoco:report
+mvn test jacoco:report
 ```
 
 ### Integration Tests
@@ -417,7 +471,7 @@ cd auth-service
 ./start-all.sh
 
 # Run integration tests
-./mvnw test -P integration-tests
+mvn test -P integration-tests
 ```
 
 ### End-to-End Testing
@@ -425,6 +479,9 @@ cd auth-service
 ```bash
 # 1. Start all services
 ./start-all.sh
+./start-auth.sh
+./start-order.sh
+./start-notification.sh
 
 # 2. Register a user
 curl -X POST http://localhost:8081/api/auth/register \
@@ -448,6 +505,7 @@ curl http://localhost:8083/api/notifications/email/test@example.com
 - **Database Security:** Each service has its own database with unique credentials
 - **Network Isolation:** Services communicate through a custom Docker network
 - **Environment Variables:** Sensitive data is stored in environment variables
+- **Updated Dependencies:** All dependencies are up-to-date with security patches
 
 ### Security Configuration
 
@@ -459,7 +517,7 @@ curl http://localhost:8083/api/notifications/email/test@example.com
    ```
 
 2. **Default Settings:**
-   - Simple passwords for development convenience
+   - Development-friendly passwords
    - Services only accessible on localhost
    - Not suitable for production use
 
@@ -472,6 +530,8 @@ curl http://localhost:8083/api/notifications/email/test@example.com
 - Regularly rotate credentials
 - Set up proper firewall rules
 - Use HTTPS for all API endpoints
+- Enable JWT token expiration
+- Use production-grade JWT secrets
 
 #### Environment Variables for Production
 ```bash
@@ -479,7 +539,7 @@ curl http://localhost:8083/api/notifications/email/test@example.com
 AUTH_DB_PASSWORD=very_secure_random_password_123!
 ORDER_DB_PASSWORD=another_secure_password_456!
 NOTIFICATION_DB_PASSWORD=yet_another_secure_password_789!
-JWT_SECRET=very_long_and_random_jwt_secret_key_for_production
+JWT_SECRET=very_long_and_random_jwt_secret_key_for_production_use_only
 KAFKA_BOOTSTRAP_SERVERS=your-kafka-cluster:9092
 ```
 
@@ -487,7 +547,17 @@ KAFKA_BOOTSTRAP_SERVERS=your-kafka-cluster:9092
 
 ### Common Issues
 
-#### 1. Port Already in Use
+#### 1. Java Version Mismatch
+```bash
+# Check Java version
+java -version
+# Should show: openjdk version "21.0.6" or higher
+
+# If wrong version, set JAVA_HOME
+export JAVA_HOME=/path/to/java-21
+```
+
+#### 2. Port Already in Use
 ```bash
 # Check what's using the port
 lsof -i :8081
@@ -497,7 +567,7 @@ lsof -i :9092
 sudo lsof -ti:8081 | xargs kill -9
 ```
 
-#### 2. Database Connection Failed
+#### 3. Database Connection Failed
 ```bash
 # Check if database containers are running
 docker ps | grep postgres
@@ -511,7 +581,7 @@ docker logs notification-db
 cat .env
 ```
 
-#### 3. Kafka Not Starting
+#### 4. Kafka Not Starting
 ```bash
 # Check Kafka logs
 docker logs kafka
@@ -522,39 +592,38 @@ docker-compose down kafka zookeeper
 ./start-kafka.sh
 ```
 
-#### 4. Service Won't Start
+#### 5. Service Won't Start
 ```bash
 # Check if all dependencies are running
 docker ps
 
-# Check for Maven wrapper permissions
-chmod +x mvnw
+# Check if environment variables are loaded
+export $(cat .env | grep -v '^#' | xargs)
+echo $AUTH_DB_PASSWORD
 
 # Check service logs
 cd {service-name}
-./mvnw spring-boot:run --debug
+mvn spring-boot:run --debug
 ```
 
-#### 5. Permission Denied on Scripts
+#### 6. Maven Wrapper Issues
 ```bash
-# Make all scripts executable
-chmod +x *.sh
-
-# Or run with bash
-bash start-kafka.sh
+# If mvnw doesn't exist
+cd auth-service
+mvn wrapper:wrapper
+chmod +x mvnw
 ```
 
-#### 6. Environment Variables Not Loading
+#### 7. Environment Variables Not Loading
 ```bash
 # Check if .env file exists
 ls -la .env
 
-# Verify environment variables
-docker-compose config
+# Load variables manually
+export $(cat .env | grep -v '^#' | xargs)
 
-# Restart containers after .env changes
-docker-compose down
-./start-all.sh
+# Verify variables are set
+env | grep -E "(AUTH_DB_PASSWORD|ORDER_DB_PASSWORD|NOTIFICATION_DB_PASSWORD)"
 ```
 
 ### Useful Commands
@@ -615,13 +684,19 @@ docker ps
 
 ### System Health Check Script
 
+Create a comprehensive health check script:
+
 ```bash
 #!/bin/bash
 echo "🔍 OMS System Health Check"
 echo "=========================="
 
+# Check Java version
+echo "☕ Java Version:"
+java -version
+
 # Check containers
-echo "📦 Container Status:"
+echo -e "\n📦 Container Status:"
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 echo -e "\n🌐 Service Health:"
@@ -649,8 +724,8 @@ echo -e "\n📨 Kafka Status:"
 
 ### Code Style
 
-- Follow **Java 17** best practices
-- Use **Spring Boot** conventions
+- Follow **Java 21** best practices
+- Use **Spring Boot 3.2.0** conventions
 - Write **unit tests** for new features
 - Update **documentation** for API changes
 - Follow **RESTful API** design principles
@@ -663,6 +738,7 @@ echo -e "\n📨 Kafka Status:"
 - Add logging for debugging
 - Write comprehensive tests
 - Never commit sensitive data (passwords, secrets)
+- Use modern Java features (Records, Pattern Matching, etc.)
 
 ---
 
@@ -675,12 +751,14 @@ If you encounter any issues:
 3. Verify all containers are running with `docker ps`
 4. Test individual components using the provided scripts
 5. Check your `.env` file configuration
-6. Create an issue in the repository
+6. Verify Java version compatibility
+7. Create an issue in the repository
 
 ### Quick Debug Commands
 
 ```bash
 # Full system check
+java -version
 docker ps
 ./kafka-test.sh
 curl http://localhost:8081/api/auth/health
@@ -706,11 +784,18 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Happy Coding! 🚀**
 
-*Built with ❤️ using Spring Boot, PostgreSQL, and Apache Kafka*
+*Built with ❤️ using Java 21, Spring Boot 3.2.0, PostgreSQL, and Apache Kafka*
 
 ---
 
 ## 🔖 Quick Reference
+
+### System Requirements
+- **Java:** 21 (OpenJDK Temurin 21.0.6+)
+- **Spring Boot:** 3.2.0
+- **Maven:** 3.8+
+- **Docker:** Latest
+- **Docker Compose:** Latest
 
 ### Ports
 - **Auth Service:** 8081
@@ -727,4 +812,27 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - `.env` - Environment variables (gitignored)
 - `.env.example` - Environment template
 - `start-all.sh` - Start all containers
+- `start-auth.sh` - Start auth service
+- `start-order.sh` - Start order service
+- `start-notification.sh` - Start notification service
 - `kafka-*.sh` - Kafka management scripts
+
+### Quick Start Commands
+```bash
+# 1. Clone and setup
+git clone https://github.com/anupgautam23/oms.git
+cd oms
+cp .env.example .env
+chmod +x *.sh
+
+# 2. Start infrastructure
+./start-all.sh
+
+# 3. Start services
+./start-auth.sh
+./start-order.sh
+./start-notification.sh
+
+# 4. Test
+curl http://localhost:8081/api/auth/health
+```

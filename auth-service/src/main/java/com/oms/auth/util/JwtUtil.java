@@ -92,7 +92,7 @@ public class JwtUtil {
     }
     
     /**
-     * Validate JWT token
+     * Validate JWT token with user details
      * @param token JWT token
      * @param userDetails user details
      * @return true if token is valid
@@ -100,6 +100,25 @@ public class JwtUtil {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+    
+    /**
+     * Validate JWT token (without user details)
+     * @param token JWT token
+     * @return true if token is valid
+     */
+    public boolean isTokenValid(String token) {
+        try {
+            // Try to extract claims and check expiration
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (JwtException e) {
+            // Token is invalid (malformed, expired, etc.)
+            return false;
+        } catch (Exception e) {
+            // Any other exception means token is invalid
+            return false;
+        }
     }
     
     /**
@@ -118,6 +137,15 @@ public class JwtUtil {
      */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+    
+    /**
+     * Extract issued at date from token
+     * @param token JWT token
+     * @return issued at date
+     */
+    public Date extractIssuedAt(String token) {
+        return extractClaim(token, Claims::getIssuedAt);
     }
     
     /**
@@ -141,5 +169,52 @@ public class JwtUtil {
     private SecretKey getSignInKey() {                                 
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+    
+    /**
+     * Get remaining time until token expires
+     * @param token JWT token
+     * @return remaining time in milliseconds
+     */
+    public long getTokenRemainingTime(String token) {
+        Date expiration = extractExpiration(token);
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+    
+    /**
+     * Check if token is about to expire (within specified minutes)
+     * @param token JWT token
+     * @param minutes minutes threshold
+     * @return true if token expires within the specified minutes
+     */
+    public boolean isTokenAboutToExpire(String token, int minutes) {
+        long remainingTime = getTokenRemainingTime(token);
+        return remainingTime < (minutes * 60 * 1000); // Convert minutes to milliseconds
+    }
+    
+    /**
+     * Extract user ID from token if present
+     * @param token JWT token
+     * @return user ID or null if not present
+     */
+    public String extractUserId(String token) {
+        try {
+            return extractClaim(token, claims -> claims.get("userId", String.class));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Extract user email from token if present
+     * @param token JWT token
+     * @return user email or null if not present
+     */
+    public String extractUserEmail(String token) {
+        try {
+            return extractClaim(token, claims -> claims.get("email", String.class));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

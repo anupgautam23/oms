@@ -1,9 +1,9 @@
-// filepath: /Users/anupgoutam/Documents/OMS/auth-service/src/main/java/com/oms/auth/service/AuthService.java
 package com.oms.auth.service;
 
 import com.oms.auth.dto.AuthResponseDto;
 import com.oms.auth.dto.LoginRequestDto;
 import com.oms.auth.dto.RegisterRequestDto;
+import com.oms.auth.dto.UserDetailsDto;
 import com.oms.auth.entity.User;
 import com.oms.auth.exception.UserAlreadyExistsException;
 import com.oms.auth.exception.UserNotFoundException;
@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class AuthService implements UserDetailsService {
@@ -83,6 +85,10 @@ public class AuthService implements UserDetailsService {
             request.getUsernameOrEmail()
         ).orElseThrow(() -> new UserNotFoundException("User not found"));
         
+        // Update last login time
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+        
         // Generate JWT token
         String token = jwtUtil.generateToken(userDetails);
         
@@ -94,10 +100,107 @@ public class AuthService implements UserDetailsService {
         );
     }
     
+    /**
+     * Get current user details using JWT token
+     * @param token JWT token
+     * @return UserDetailsDto with user information
+     */
+    public UserDetailsDto getCurrentUserDetails(String token) {
+        try {
+            // Validate token first
+            if (!jwtUtil.isTokenValid(token)) {
+                throw new RuntimeException("Invalid or expired token");
+            }
+            
+            // Extract username from token
+            String username = jwtUtil.extractUsername(token);
+            
+            // Get user from database
+            User user = userRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+            
+            return convertToUserDetailsDto(user);
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving user details: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Get user details by username
+     * @param username Username
+     * @return UserDetailsDto with user information
+     */
+    public UserDetailsDto getUserDetailsByUsername(String username) {
+        User user = userRepository.findByUsernameOrEmail(username, username)
+            .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
+        
+        return convertToUserDetailsDto(user);
+    }
+    
+    /**
+     * Validate JWT token
+     * @param token JWT token
+     * @return true if token is valid
+     */
+    public boolean validateToken(String token) {
+        return jwtUtil.isTokenValid(token);
+    }
+    
+    /**
+     * Refresh JWT token
+     * @param token Current JWT token
+     * @return AuthResponseDto with new token
+     */
+    public AuthResponseDto refreshToken(String token) {
+        try {
+            // Validate current token
+            if (!jwtUtil.isTokenValid(token)) {
+                throw new RuntimeException("Invalid or expired token");
+            }
+            
+            // Extract username from token
+            String username = jwtUtil.extractUsername(token);
+            
+            // Get user from database
+            User user = userRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+            
+            // Generate new token
+            String newToken = jwtUtil.generateToken(user);
+            
+            return new AuthResponseDto(
+                newToken,
+                user.getId(),
+                user.getUsername(),
+                user.getEmail()
+            );
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error refreshing token: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Convert User entity to UserDetailsDto
+     * @param user User entity
+     * @return UserDetailsDto
+     */
+    private UserDetailsDto convertToUserDetailsDto(User user) {
+        return new UserDetailsDto(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.isActive(),
+            user.getLastLoginAt()
+        );
+    }
+    
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        return  userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + usernameOrEmail));
-
     }
 }

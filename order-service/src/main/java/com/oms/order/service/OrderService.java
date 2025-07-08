@@ -1,5 +1,6 @@
 package com.oms.order.service;
 
+import com.oms.order.client.UserServiceClient;
 import com.oms.order.dto.CreateOrderRequestDto;
 import com.oms.order.dto.OrderEventDto;
 import com.oms.order.dto.OrderResponseDto;
@@ -20,17 +21,21 @@ import java.util.stream.Collectors;
 public class OrderService {
     
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    
     private final OrderRepository orderRepository;
+    private final UserServiceClient userServiceClient;
     
     @Autowired(required = false)
     private KafkaProducerService kafkaProducerService;
     
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, UserServiceClient userServiceClient) {
         this.orderRepository = orderRepository;
+        this.userServiceClient = userServiceClient;
     }
     
-    public OrderResponseDto createOrder(CreateOrderRequestDto request, String username) {
-        Long userId = getUserIdFromUsername(username);
+    public OrderResponseDto createOrder(CreateOrderRequestDto request, String username, String token) {
+        // Get real user ID from Auth Service
+        Long userId = getUserIdFromToken(token, username);
         
         Order order = new Order();
         order.setUserId(userId);
@@ -40,7 +45,7 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         
         Order savedOrder = orderRepository.save(order);
-        logger.info("Order created successfully: {}", savedOrder.getId());
+        logger.info("Order created successfully: {} for user: {}", savedOrder.getId(), userId);
         
         // Send order event to Kafka if available
         if (kafkaProducerService != null) {
@@ -67,19 +72,25 @@ public class OrderService {
         return convertToDto(savedOrder);
     }
     
-    public List<OrderResponseDto> getOrdersByUser(String username) {
-        Long userId = getUserIdFromUsername(username);
+    public List<OrderResponseDto> getOrdersByUser(String username, String token) {
+        // Get real user ID from Auth Service
+        Long userId = getUserIdFromToken(token, username);
+        
         List<Order> orders = orderRepository.findByUserId(userId);
+        logger.info("Retrieved {} orders for user: {}", orders.size(), userId);
+        
         return orders.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
     
-    public OrderResponseDto getOrderById(Long orderId, String username) {
+    public OrderResponseDto getOrderById(Long orderId, String username, String token) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
         
-        Long userId = getUserIdFromUsername(username);
+        // Get real user ID from Auth Service
+        Long userId = getUserIdFromToken(token, username);
+        
         if (!order.getUserId().equals(userId)) {
             throw new UnauthorizedException("You are not authorized to view this order");
         }
@@ -87,18 +98,20 @@ public class OrderService {
         return convertToDto(order);
     }
     
-    public OrderResponseDto updateOrderStatus(Long orderId, OrderStatus newStatus, String username) {
+    public OrderResponseDto updateOrderStatus(Long orderId, OrderStatus newStatus, String username, String token) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
         
-        Long userId = getUserIdFromUsername(username);
+        // Get real user ID from Auth Service
+        Long userId = getUserIdFromToken(token, username);
+        
         if (!order.getUserId().equals(userId)) {
             throw new UnauthorizedException("You are not authorized to update this order");
         }
         
         order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
-        logger.info("Order status updated: {} -> {}", orderId, newStatus);
+        logger.info("Order status updated: {} -> {} for user: {}", orderId, newStatus, userId);
         
         // Send order update event to Kafka if available
         if (kafkaProducerService != null) {
@@ -124,18 +137,20 @@ public class OrderService {
         return convertToDto(updatedOrder);
     }
     
-    public void cancelOrder(Long orderId, String username) {
+    public void cancelOrder(Long orderId, String username, String token) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
         
-        Long userId = getUserIdFromUsername(username);
+        // Get real user ID from Auth Service
+        Long userId = getUserIdFromToken(token, username);
+        
         if (!order.getUserId().equals(userId)) {
             throw new UnauthorizedException("You are not authorized to cancel this order");
         }
         
         order.setStatus(OrderStatus.CANCELLED);
         Order cancelledOrder = orderRepository.save(order);
-        logger.info("Order cancelled: {}", orderId);
+        logger.info("Order cancelled: {} for user: {}", orderId, userId);
         
         // Send order cancellation event to Kafka if available
         if (kafkaProducerService != null) {
@@ -173,7 +188,28 @@ public class OrderService {
         );
     }
     
-    private Long getUserIdFromUsername(String username) {
-        return (long) Math.abs(username.hashCode());
+    /**
+     * Get real user ID from Auth Service using JWT token
+     * @param token JWT token
+     * @param username fallback username
+     * @return real user ID
+     */
+    private Long getUserIdFromToken(String token, String username) {
+        if (token != null) {
+            try {
+                UserServiceClient.UserDetails userDetails = userServiceClient.getUserDetails(token);
+                if (userDetails != null && userDetails.getId() != null) {
+                    logger.debug("Retrieved user ID: {} for username: {}", userDetails.getId(), username);
+                    return userDetails.getId();
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to get user ID from auth service: {}", e.getMessage());
+            }
+        }
+        
+        // Fallback to hash-based ID if auth service is unavailable
+        Long fallbackId = (long) Math.abs(username.hashCode());
+        logger.warn("Using fallback user ID: {} for username: {}", fallbackId, username);
+        return fallbackId;
     }
 }

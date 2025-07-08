@@ -11,28 +11,12 @@ import java.time.LocalDateTime;
  */
 public class UserDetailsDto {
     
-    @JsonProperty("id")
     private Long id;
-    
-    @JsonProperty("username")
     private String username;
-    
-    @JsonProperty("email")
     private String email;
-    
-    @JsonProperty("createdAt")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
-    
-    @JsonProperty("updatedAt")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
-    
-    @JsonProperty("isActive")
     private boolean isActive;
-    
-    @JsonProperty("lastLoginAt")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastLoginAt;
     
     // Default constructor
@@ -59,7 +43,7 @@ public class UserDetailsDto {
         this.lastLoginAt = lastLoginAt;
     }
     
-    // Getters and Setters
+    // Standard getters and setters
     public Long getId() {
         return id;
     }
@@ -84,6 +68,7 @@ public class UserDetailsDto {
         this.email = email;
     }
     
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -92,6 +77,7 @@ public class UserDetailsDto {
         this.createdAt = createdAt;
     }
     
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
@@ -100,14 +86,17 @@ public class UserDetailsDto {
         this.updatedAt = updatedAt;
     }
     
-    public boolean isActive() {
+    // Use standard boolean getter/setter (not isActive/setActive)
+    @JsonProperty("isActive")
+    public boolean getIsActive() {
         return isActive;
     }
     
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
     
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime getLastLoginAt() {
         return lastLoginAt;
     }

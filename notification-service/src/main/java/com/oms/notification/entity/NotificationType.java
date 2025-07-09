@@ -1,8 +1,12 @@
 package com.oms.notification.entity;
 
 public enum NotificationType {
-    EMAIL,
-    SMS,
-    PUSH_NOTIFICATION,
-    IN_APP
+    ORDER_CONFIRMATION,
+    ORDER_STATUS_UPDATE,
+    ORDER_CANCELLATION,
+    ORDER_SHIPPED,
+    ORDER_DELIVERED,
+    PAYMENT_CONFIRMATION,
+    SYSTEM_NOTIFICATION,
+    PROMOTIONAL
 }

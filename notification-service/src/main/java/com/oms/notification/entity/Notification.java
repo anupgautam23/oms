@@ -41,7 +41,13 @@ public class Notification {
     private LocalDateTime sentAt;
     
     @Column
+    private LocalDateTime readAt;
+    
+    @Column
     private String errorMessage;
+    
+    @Column(nullable = false)
+    private boolean isRead = false;
     
     // Constructors
     public Notification() {
@@ -91,6 +97,28 @@ public class Notification {
     public LocalDateTime getSentAt() { return sentAt; }
     public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
     
+    public LocalDateTime getReadAt() { return readAt; }
+    public void setReadAt(LocalDateTime readAt) { this.readAt = readAt; }
+    
     public String getErrorMessage() { return errorMessage; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+    
+    public boolean isRead() { return isRead; }
+    public void setRead(boolean read) { isRead = read; }
+    
+    @Override
+    public String toString() {
+        return "Notification{" +
+                "id=" + id +
+                ", orderId=" + orderId +
+                ", userId=" + userId +
+                ", recipient='" + recipient + '\'' +
+                ", subject='" + subject + '\'' +
+                ", type=" + type +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", sentAt=" + sentAt +
+                ", isRead=" + isRead +
+                '}';
+    }
 }

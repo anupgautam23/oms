@@ -1,50 +1,89 @@
-server:
-  port: 8083
-
 spring:
-  application:
-    name: notification-service
+  profiles:
+    active: local
 
-  # H2 Database configuration for testing
+  # Database configuration
   datasource:
     url: jdbc:postgresql://localhost:5435/notificationdb
-    driverClassName: org.postgresql.Driver
     username: postgres
     password: ${NOTIFICATION_DB_PASSWORD:notification123}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
-  # Kafka Configuration - Simplified
+  # Email configuration using Sendinblue (Brevo) SMTP
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SENDINBLUE_USERNAME}
+    password: ${SENDINBLUE_SMTP_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+        transport:
+          protocol: smtp
+    default-encoding: UTF-8
+    test-connection: false # Set to true for testing connection on startup
+
+  # Kafka configuration (if using Kafka for events)
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: notification-service-group-v5
-      auto-offset-reset: latest
+      group-id: notification-service
+      auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
-  # Jackson configuration
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-    deserialization:
-      adjust-dates-to-context-time-zone: false
+# Server configuration
+server:
+  port: 8083
 
+# Application specific configuration
+app:
+  email:
+    from: ${DEFAULT_FROM_EMAIL:noreply@yourcompany.com}
+    from-name: ${DEFAULT_FROM_NAME:Order Management System}
+
+# Auth service configuration
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://localhost:8081}
+
+# JWT Configuration (ADD THIS SECTION)
 jwt:
-  secret: ${JWT_SECRET:bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=}
-  expiration: 86400000 # 24 hours in milliseconds
+  secret: ${JWT_SECRET:bXlTZWNyZXRLZXkxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTBBQkNERUY=} # At least 32 characters
+  expiration: ${JWT_EXPIRATION:86400} # 24 hours in seconds
 
-# Enable Kafka
+# Async configuration
+async:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 100
+
+# Kafka configuration (ADD THIS SECTION)
 kafka:
-  enabled: true
-  topics:
-    order-events: order-events
+  enabled: ${KAFKA_ENABLED:true}
 
-# Email settings
-email:
-  enabled: false # Set to true when you want to send actual emails
-  from: noreply@oms.com
+# Logging configuration
+logging:
+  level:
+    com.oms.notification: DEBUG
+    org.springframework.mail: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

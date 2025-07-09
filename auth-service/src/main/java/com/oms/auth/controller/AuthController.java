@@ -4,6 +4,7 @@ import com.oms.auth.dto.AuthResponseDto;
 import com.oms.auth.dto.LoginRequestDto;
 import com.oms.auth.dto.RegisterRequestDto;
 import com.oms.auth.dto.UserDetailsDto;
+import com.oms.auth.exception.UserNotFoundException;
 import com.oms.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -135,6 +136,25 @@ public class AuthController {
         return ResponseEntity.ok("Auth Service is running!");
     }
     
+
+  /**
+     * Get user details by user ID (for internal service communication)
+     * @param userId User ID
+     * @return UserDetailsDto with user information
+     */
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserDetailsDto> getUserById(@PathVariable Long userId) {
+        try {
+            UserDetailsDto userDetails = authService.getUserDetailsById(userId);
+            return ResponseEntity.ok(userDetails);
+            
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.notFound().build();
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     /**
      * Extract JWT token from Authorization header
      * @param request HTTP request

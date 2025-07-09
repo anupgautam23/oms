@@ -44,8 +44,8 @@ public class KafkaConsumerService {
             OrderEventDto orderEvent = objectMapper.readValue(rawMessage, OrderEventDto.class);
             logger.info("✅ Successfully parsed: {}", orderEvent);
             
-            // Process the order event
-            notificationService.processOrderEvent(orderEvent);
+            // Process the order event - FIXED: Use handleOrderEvent instead of processOrderEvent
+            notificationService.handleOrderEvent(orderEvent);
             
             logger.info("✅ Successfully processed order event for order: {}", orderEvent.getOrderId());
             
